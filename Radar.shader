@@ -23,7 +23,9 @@
 			#include "UnityCG.cginc"
 
 			#define PI  3.14159265359
-			
+			//min->compares and returns minimum parameter between two. x>y ret y; or x<y ret x;			
+			#define SF 1./min(_ScreenParams.x,_ScreenParams.y)
+
 
 			 struct appdata
 			{
@@ -85,11 +87,23 @@
 				}
 
 
-				float gridIncrement = .1;
-				float gridLineThickness = 1./_ScreenParams.y*_Thickness;
-				float gridAddend = (1. - step(gridLineThickness, getModulo(uv.x, gridIncrement)))
-					+ (1. - step(gridLineThickness, getModulo(uv.y, gridIncrement)));
-				clippedGreen+= gridAddend;
+				//float gridIncrement = .1;
+				//float gridLineThickness = 1./_ScreenParams.y*_Thickness;
+				//float gridAddend = (1. - step(gridLineThickness, getModulo(uv.x, gridIncrement)))
+				//	+ (1. - step(gridLineThickness, getModulo(uv.y, gridIncrement)));
+				//clippedGreen+= gridAddend;
+
+				//Cascading circles
+				float iv = .1*round(dist / .1);
+				float m = smoothstep(.005, .0, abs(iv - dist));
+				m *= step(dist, containerRadius);
+				//Cascading circles end
+
+				//axis lines
+				m += smoothstep(SF, .0, abs(SF - uv.x*.5));
+				m += smoothstep(SF, .0, abs(SF - uv.y*.5));
+				//axis lines end
+
 
 				float gradientAngleAmount = PI / 4.;
 				float uvAngle = (atan2(uv.y, uv.x) + PI * 2.)%( PI * 2.);
@@ -99,7 +113,8 @@
 				uv.x /= _ScreenParams.x / _ScreenParams.y;
 				uv += .5;
 				float4 col = float4(0., 0., 0., 0.);
-				col.r += container+clippedGreen*clipToRadius;
+				col.g += container+(clippedGreen+m)*clipToRadius;
+				//col.g = 1.-container*.5;
 				return col;
             }
             ENDCG

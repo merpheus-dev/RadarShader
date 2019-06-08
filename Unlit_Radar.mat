@@ -24,7 +24,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - _PointCount: 8
+    - _PointCount: 2
     - _Speed: 50
     - _Thickness: 3
     m_Colors: []
